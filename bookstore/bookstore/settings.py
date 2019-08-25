@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
     # local apps 
     'books.apps.BooksConfig',
     'users.apps.UsersConfig',
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
 
     # remote apps
     'crispy_forms',
+
 ]
 
 MIDDLEWARE = [
@@ -87,11 +89,24 @@ WSGI_APPLICATION = 'bookstore.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE' : 'django.db.backends.mysql',
+        'USER' : 'root',
+        'PASSWORD':'',
+        'NAME' : 'book_store',
+        'HOST':'localhost',
+        'PORT' : '3306',
         'OPTIONS': {
-            'read_default_file':'/etc/mysql/my.cnf'
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            # Tell MySQLdb to connect with 'utf8mb4' character set
+            'charset': 'utf8mb4',
         },
+        # Tell Django to build the test database with the 'utf8mb4' character set
+        'TEST': {
+            'CHARSET': 'utf8mb4',
+            'COLLATION': 'utf8mb4_unicode_ci',
+        }
     }
+    
 }
 
 
@@ -113,12 +128,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
 LOGOUT_REDIRECT_URL = ''
 PASSWORD_RESET_TIMEOUT_DAYS = 7
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
