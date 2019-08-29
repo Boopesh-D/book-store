@@ -113,11 +113,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CRISPY_TEMPLATE_PACK = "bootstrap4"
+
 AUTH_USER_MODEL = 'users.User'
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
-LOGOUT_REDIRECT_URL = ''
+LOGOUT_REDIRECT_URL = '/home/'
 PASSWORD_RESET_TIMEOUT_DAYS = 7
 
 # Internationalization

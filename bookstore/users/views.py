@@ -1,14 +1,26 @@
+from django.urls import reverse
 from django.template.loader import render_to_string
 from django.shortcuts import render, redirect
 from django.contrib.sites.shortcuts import get_current_site
-from .forms import SignUpForm, UserLoginForm
+from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.utils.http import (
     urlsafe_base64_encode, 
     urlsafe_base64_decode
 )
+
 from django.utils.encoding import force_bytes, force_text
-from django.contrib.auth import (authenticate, get_user_model)
+
+from django.contrib.auth import (
+    authenticate, 
+    get_user_model, 
+    login, 
+    logout
+)
+
+from .forms import SignUpForm, UserLoginForm
 from users.tokens import account_activation_token
+
 User = get_user_model()
 
 def signup(request):
@@ -16,13 +28,10 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save(commit = True)
-            # user.set_password(form.cleaned_data.get('password1'))
-            # user.save(commit = True)
-
+            user = form.save()
             current_site = get_current_site(request)
             subject = "Activate your OpenPustakalay Account"
-            
+
             message = render_to_string(
                 'users/account_activation.html', {
                     'user': user,
@@ -47,19 +56,24 @@ def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
             
-            user = authenticate(username = username, password = password)
-            
-            next = request.GET.get('next')
-            
-            if next:
-                return redirect(next)
+            user = authenticate(email = email, password = password)
+
+            if user:
+                login(request, user)
+
+                return HttpResponseRedirect(reverse("home"))
     else:
         form = UserLoginForm()
 
     return render(request, "users/login.html", context = {'form':form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("home"))
 
 def activate(request, uidb64, token):
     try:
